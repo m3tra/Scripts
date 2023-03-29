@@ -14,7 +14,7 @@ apt install ssh -y
 mv -f /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 
 read -p "Choose SSH port(default 22): " PORT
-if [[ -n ${PORT//[0-9]/} || ]]; then
+if [[ -n ${PORT//[0-9]/} ]]; then
 	PORT=22
 fi
 
