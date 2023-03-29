@@ -13,49 +13,52 @@ apt install ssh -y
 
 mv -f /etc/sshd_config /etc/sshd_config.bak
 
-read -p "Choose SSH port: " PORT
+read -p "Choose SSH port(default 22): " PORT
+if [[ -n ${input//[0-9]/} ]]; then
+	PORT=22
+fi
 
-echo -e "
-	Protocol 2
-	AllowUsers user
+echo "
+Protocol 2
+AllowUsers user
 
-	Port $PORT
+Port $PORT
 
-	PermitRootLogin no
-	MaxAuthTries 3
-	MaxSessions 5
+PermitRootLogin no
+MaxAuthTries 3
+MaxSessions 5
 
-	PubkeyAuthentication no
+PubkeyAuthentication no
 
-	PasswordAuthentication yes
-	PermitEmptyPasswords no
-	IgnoreRhosts yes
-	HostbasedAuthentication no
-	ChallengeResponseAuthentication no
-	UsePAM yes
+PasswordAuthentication yes
+PermitEmptyPasswords no
+IgnoreRhosts yes
+HostbasedAuthentication no
+ChallengeResponseAuthentication no
+UsePAM yes
 
-	AllowAgentForwarding no
-	AllowTcpForwarding no
-	X11Forwarding no
-	PrintMotd no
-	TCPKeepAlive yes
+AllowAgentForwarding no
+AllowTcpForwarding no
+X11Forwarding no
+PrintMotd no
+TCPKeepAlive yes
 
-	PermitUserEnvironment no
-	LoginGraceTime 1m
-	ClientAliveInterval 2m
-	LogLevel INFO
-	PrintLastLog yes
+PermitUserEnvironment no
+LoginGraceTime 1m
+ClientAliveInterval 2m
+LogLevel INFO
+PrintLastLog yes
 
-	# no default banner path
-	Banner /etc/issue.net
+# no default banner path
+Banner /etc/issue.net
 
-	# Allow client to pass locale environment variables
-	AcceptEnv LANG LC_*
+# Allow client to pass locale environment variables
+AcceptEnv LANG LC_*
 
-	# override default of no subsystems
-	Subsystem sftp /usr/lib/openssh/sftp-server
+# override default of no subsystems
+Subsystem sftp /usr/lib/openssh/sftp-server
 
-	DebianBanner no" > /etc/sshd_config
+DebianBanner no" > /etc/sshd_config
 
 chmod 600 /etc/ssh/sshd_config
 
@@ -82,40 +85,46 @@ sed -i 's/^\#HostKey \/etc\/ssh\/ssh_host_\(rsa\|ed25519\)_key$/HostKey \/etc\/s
 
 if [[ $(cat /etc/os-release | grep -i "Debian" | wc -l) -ne 0 ]]; then
 	if [[ $(cat /etc/os-release | grep -i "Buster" | wc -l) -ne 0 ]]; then
-		echo -e "
-			# Restrict key exchange, cipher, and MAC algorithms, as per sshaudit.com
-			# hardening guide.
-			KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
-			Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-			MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
-			HostKeyAlgorithms ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-512,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512-cert-v01@openssh.com" >> /etc/ssh/sshd_config
+		echo "
+# Restrict key exchange, cipher, and MAC algorithms, as per sshaudit.com
+# hardening guide.
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
+HostKeyAlgorithms ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-512,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512-cert-v01@openssh.com
+" >> /etc/ssh/sshd_config
+
 	elif [[ $(cat /etc/os-release | grep -i "Bullseye" | wc -l) -ne 0 ]]; then
-		echo -e "
-			# Restrict key exchange, cipher, and MAC algorithms, as per sshaudit.com
-			# hardening guide.
-			KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
-			Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-			MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
-			HostKeyAlgorithms ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-512,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512-cert-v01@openssh.com" > /etc/ssh/sshd_config.d/ssh-audit_hardening.conf
+		echo "
+# Restrict key exchange, cipher, and MAC algorithms, as per sshaudit.com
+# hardening guide.
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
+HostKeyAlgorithms ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-512,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512-cert-v01@openssh.com
+" > /etc/ssh/sshd_config.d/ssh-audit_hardening.conf
 	fi
 
 elif [[ $(cat /etc/os-release | grep -i "Ubuntu" | wc -l) -ne 0 ]]; then
 	if [[ $(cat /etc/os-release | grep -i "Ubuntu 20.04" | wc -l) -ne 0 ]]; then
-		echo -e "
-			# Restrict key exchange, cipher, and MAC algorithms, as per sshaudit.com
-			# hardening guide.
-			KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,gss-curve25519-sha256-,diffie-hellman-group16-sha512,gss-group16-sha512-,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
-			Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-			MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
-			HostKeyAlgorithms ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,rsa-sha2-512,rsa-sha2-512-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-256-cert-v01@openssh.com" > /etc/ssh/sshd_config.d/ssh-audit_hardening.conf
+		echo "
+# Restrict key exchange, cipher, and MAC algorithms, as per sshaudit.com
+# hardening guide.
+KexAlgorithms sntrup761x25519-sha512@openssh.com,curve25519-sha256,curve25519-sha256@libssh.org,gss-curve25519-sha256-,diffie-hellman-group16-sha512,gss-group16-sha512-,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
+HostKeyAlgorithms ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,rsa-sha2-512,rsa-sha2-512-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-256-cert-v01@openssh.com
+" > /etc/ssh/sshd_config.d/ssh-audit_hardening.conf
+
 	elif [[ $(cat /etc/os-release | grep -i "Ubuntu 22.04" | wc -l) -ne 0 ]]; then
-		echo -e "
-			# Restrict key exchange, cipher, and MAC algorithms, as per sshaudit.com
-			# hardening guide.
-			KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
-			Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
-			MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
-			HostKeyAlgorithms ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-512,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512-cert-v01@openssh.com" > /etc/ssh/sshd_config.d/ssh-audit_hardening.conf
+		echo "
+# Restrict key exchange, cipher, and MAC algorithms, as per sshaudit.com
+# hardening guide.
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha256
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
+MACs hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,umac-128-etm@openssh.com
+HostKeyAlgorithms ssh-ed25519,ssh-ed25519-cert-v01@openssh.com,sk-ssh-ed25519@openssh.com,sk-ssh-ed25519-cert-v01@openssh.com,rsa-sha2-256,rsa-sha2-512,rsa-sha2-256-cert-v01@openssh.com,rsa-sha2-512-cert-v01@openssh.com
+" > /etc/ssh/sshd_config.d/ssh-audit_hardening.conf
 	fi
 fi
 
