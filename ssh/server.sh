@@ -13,7 +13,7 @@ apt install ssh -y
 
 mv -f /etc/sshd_config /etc/sshd_config.bak
 
-read -p "Choose SSH port" PORT
+read -p "Choose SSH port: " PORT
 
 echo "
 	Protocol 2
