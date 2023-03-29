@@ -11,7 +11,7 @@ fi
 
 apt install ssh -y
 
-mv -f /etc/sshd_config /etc/sshd_config.bak
+mv -f /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 
 read -p "Choose SSH port(default 22): " PORT
 if [[ -n ${input//[0-9]/} ]]; then
@@ -58,7 +58,7 @@ AcceptEnv LANG LC_*
 # override default of no subsystems
 Subsystem sftp /usr/lib/openssh/sftp-server
 
-DebianBanner no" > /etc/sshd_config
+DebianBanner no" > /etc/ssh/sshd_config
 
 chmod 600 /etc/ssh/sshd_config
 
