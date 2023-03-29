@@ -15,7 +15,7 @@ mv -f /etc/sshd_config /etc/sshd_config.bak
 
 read -p "Choose SSH port: " PORT
 
-echo "
+echo -e "
 	Protocol 2
 	AllowUsers user
 
