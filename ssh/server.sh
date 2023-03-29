@@ -119,3 +119,7 @@ elif [[ $(cat /etc/os-release | grep -i "Ubuntu" | wc -l) -ne 0 ]]; then
 fi
 
 service ssh restart
+
+## Test
+
+sshd -T
