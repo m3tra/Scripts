@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Check for sudo privilege
-if [[ $EUID -ne 0 ]]; then
-	echo "$0 requires sudo."
-	exit 2
-fi
-
-
 ################
 # Installation #
 ################
