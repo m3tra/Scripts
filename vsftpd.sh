@@ -10,7 +10,7 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 ## Select user for FTP
-read -p "Choose SSH port(default 22): " USER_NAME
+read -p "Choose user: " USER_NAME
 
 ## Install
 apt install vsftpd -y
