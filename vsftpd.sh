@@ -1,50 +1,45 @@
 #!/bin/bash
 
+# Check for sudo privilege
 if [[ $EUID -ne 0 ]]; then
 	echo "$0 requires sudo."
 	exit 2
 fi
+
 
 ################
 # Installation #
 ################
 
 ## Install
-
-apt install vsftpd -y
-
-service vsftpd status
+sudo apt install vsftpd -y
 
 
-## UFW RUles
-
-echo "
-[VSFTPD]
-title=Secure FTP Daemon
-description=TLS encrypted FTP server
-ports=20,21,990/tcp|40000:50000/tcp
-" > /etc/ufw/applications.d/vsftpd
-
-ufw allow from 192.168.0.0/16 to any app vsftpd comment VSFTPD
-ufw allow from 10.51.195.0/24 to any app vsftpd comment VSFTPD
+## Enable service
+sudo systemctl enable vsftpd
+sudo systemctl start vsftpd
 
 
 ## Create FTP root directory
+sudo mkdir ~/ftp
+sudo chown nobody:nobody ~/ftp
+sudo chmod a-w ~/ftp
 
-mkdir ~/ftp
-chown nobody:nobody ~/ftp
-chmod a-w ~/ftp
-
-mkdir ~/ftp/files
-chown $USER:$USER ~/ftp/files
+sudo mkdir ~/ftp/files
+sudo chown $USER:$USER ~/ftp/files
 
 
-## Server configuration
+########################
+# Server configuration #
+########################
 
-mv /etc/vsftpd.conf /etc/vsftpd.conf.bak
+## Back up old config
+sudo mv /etc/vsftpd.conf /etc/vsftpd.conf.bak
 
-echo "
-listen=NO
+
+## Write new config
+sudo echo " \
+listen=YES
 listen_ipv6=NO
 anonymous_enable=NO
 local_enable=YES
@@ -67,26 +62,28 @@ local_root=/home/$USER/ftp
 
 userlist_enable=YES
 userlist_file=/etc/vsftpd.userlist
-userlist_deny=NO
+userlist_deny=NO \
 " > /etc/vsftpd.conf
 
 
-echo $USER > /etc/vsftpd.userlist
+## Whitelist current user
+sudo echo $USER > /etc/vsftpd.userlist
 
-systemctl restart vsftpd.service
+
+## Restart vsftpd service
+sudo systemctl restart vsftpd.service
+
 
 ##############################
 # Secure FTP Server with TLS #
 ##############################
 
 ## Create an SSL Certificate
+sudo openssl req -x509 -nodes -days 3650 -newkey rsa:4096 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
 
-openssl req -x509 -nodes -days 3650 -newkey rsa:4096 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
 
-
-## Configure TLS
-
-echo "
+## Append TLS config to config file
+sudo echo " \
 ssl_enable=YES
 rsa_cert_file=/etc/ssl/private/vsftpd.pem
 rsa_private_key_file=/etc/ssl/private/vsftpd.pem
@@ -97,7 +94,27 @@ ssl_tlsv1=YES
 ssl_sslv2=NO
 ssl_sslv3=NO
 require_ssl_reuse=NO
-ssl_ciphers=HIGH
+ssl_ciphers=HIGH \
 " >> /etc/vsftpd.conf
 
-systemctl restart vsftpd.service
+
+## Restart vsftpd service
+sudo systemctl restart vsftpd.service
+
+
+############
+# Firewall #
+############
+
+## Write vsftpd UFW application profile
+sudo echo " \
+[vsftpd]
+title=Secure FTP Daemon
+description=TLS encrypted FTP server
+ports=20,21,990/tcp|40000:50000/tcp \
+" > /etc/ufw/applications.d/vsftpd
+
+
+## Allow vsftpd application through firewall
+sudo ufw allow from 192.168.0.0/16 to any app vsftpd
+sudo ufw allow from 10.51.195.0/24 to any app vsftpd
