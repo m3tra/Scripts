@@ -19,12 +19,12 @@ systemctl start vsftpd
 
 
 ## Create FTP root directory
-mkdir ~/ftp
-chown nobody:nobody ~/ftp
-chmod a-w ~/ftp
+mkdir $LOGNAME/ftp
+chown nobody:nobody $LOGNAME/ftp
+chmod a-w $LOGNAME/ftp
 
-mkdir ~/ftp/files
-chown $LOGNAME:$LOGNAME ~/ftp/files
+mkdir $LOGNAME/ftp/files
+chown $LOGNAME:$LOGNAME $LOGNAME/ftp/files
 
 
 ########################
@@ -109,7 +109,7 @@ echo \
 "[vsftpd]
 title=Secure FTP Daemon
 description=TLS encrypted FTP server
-ports=20,21,990/tcp|40000:50000/tcp" \
+ports=20,21,990,40000:50000/tcp" \
 > /etc/ufw/applications.d/vsftpd
 
 
