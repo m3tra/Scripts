@@ -4,6 +4,11 @@
 # Installation #
 ################
 
+if [[ $EUID -ne 0 ]]; then
+	echo "$0 requires sudo."
+	exit 2
+fi
+
 ## Install
 sudo apt install vsftpd -y
 
@@ -19,7 +24,7 @@ sudo chown nobody:nobody ~/ftp
 sudo chmod a-w ~/ftp
 
 sudo mkdir ~/ftp/files
-sudo chown $USER:$USER ~/ftp/files
+sudo chown $LOGNAME:$LOGNAME ~/ftp/files
 
 
 ########################
@@ -50,8 +55,8 @@ force_dot_files=YES
 pasv_min_port=40000
 pasv_max_port=50000
 
-user_sub_token=$USER
-local_root=/home/$USER/ftp
+user_sub_token=$LOGNAME
+local_root=/home/$LOGNAME/ftp
 
 userlist_enable=YES
 userlist_file=/etc/vsftpd.userlist
@@ -60,7 +65,7 @@ userlist_deny=NO \
 
 
 ## Whitelist current user
-sudo echo $USER > /etc/vsftpd.userlist
+sudo echo $LOGNAME > /etc/vsftpd.userlist
 
 
 ## Restart vsftpd service
