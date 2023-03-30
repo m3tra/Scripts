@@ -36,8 +36,8 @@ sudo mv /etc/vsftpd.conf /etc/vsftpd.conf.bak
 
 
 ## Write new config
-sudo echo " \
-listen=YES
+sudo echo \
+"listen=YES
 listen_ipv6=NO
 anonymous_enable=NO
 local_enable=YES
@@ -60,8 +60,8 @@ local_root=/home/$LOGNAME/ftp
 
 userlist_enable=YES
 userlist_file=/etc/vsftpd.userlist
-userlist_deny=NO \
-" > /etc/vsftpd.conf
+userlist_deny=NO" \
+> /etc/vsftpd.conf
 
 
 ## Whitelist current user
@@ -81,8 +81,8 @@ sudo openssl req -x509 -nodes -days 3650 -newkey rsa:4096 -keyout /etc/ssl/priva
 
 
 ## Append TLS config to config file
-sudo echo " \
-ssl_enable=YES
+sudo echo \
+"ssl_enable=YES
 rsa_cert_file=/etc/ssl/private/vsftpd.pem
 rsa_private_key_file=/etc/ssl/private/vsftpd.pem
 allow_anon_ssl=NO
@@ -92,8 +92,8 @@ ssl_tlsv1=YES
 ssl_sslv2=NO
 ssl_sslv3=NO
 require_ssl_reuse=NO
-ssl_ciphers=HIGH \
-" >> /etc/vsftpd.conf
+ssl_ciphers=HIGH" \
+>> /etc/vsftpd.conf
 
 
 ## Restart vsftpd service
@@ -105,14 +105,16 @@ sudo systemctl restart vsftpd.service
 ############
 
 ## Write vsftpd UFW application profile
-sudo echo " \
-[vsftpd]
+sudo echo \
+"[vsftpd]
 title=Secure FTP Daemon
 description=TLS encrypted FTP server
-ports=20,21,990/tcp|40000:50000/tcp \
-" > /etc/ufw/applications.d/vsftpd
+ports=20,21,990/tcp|40000:50000/tcp" \
+> /etc/ufw/applications.d/vsftpd
 
 
 ## Allow vsftpd application through firewall
 sudo ufw allow from 192.168.0.0/16 to any app vsftpd
 sudo ufw allow from 10.51.195.0/24 to any app vsftpd
+
+sudo ufw reload
