@@ -10,21 +10,21 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 ## Install
-sudo apt install vsftpd -y
+apt install vsftpd -y
 
 
 ## Enable service
-sudo systemctl enable vsftpd
-sudo systemctl start vsftpd
+systemctl enable vsftpd
+systemctl start vsftpd
 
 
 ## Create FTP root directory
-sudo mkdir ~/ftp
-sudo chown nobody:nobody ~/ftp
-sudo chmod a-w ~/ftp
+mkdir ~/ftp
+chown nobody:nobody ~/ftp
+chmod a-w ~/ftp
 
-sudo mkdir ~/ftp/files
-sudo chown $LOGNAME:$LOGNAME ~/ftp/files
+mkdir ~/ftp/files
+chown $LOGNAME:$LOGNAME ~/ftp/files
 
 
 ########################
@@ -32,11 +32,11 @@ sudo chown $LOGNAME:$LOGNAME ~/ftp/files
 ########################
 
 ## Back up old config
-sudo mv /etc/vsftpd.conf /etc/vsftpd.conf.bak
+mv /etc/vsftpd.conf /etc/vsftpd.conf.bak
 
 
 ## Write new config
-sudo echo \
+echo \
 "listen=YES
 listen_ipv6=NO
 anonymous_enable=NO
@@ -65,11 +65,11 @@ userlist_deny=NO" \
 
 
 ## Whitelist current user
-sudo echo $LOGNAME > /etc/vsftpd.userlist
+echo $LOGNAME > /etc/vsftpd.userlist
 
 
 ## Restart vsftpd service
-sudo systemctl restart vsftpd.service
+systemctl restart vsftpd.service
 
 
 ##############################
@@ -77,11 +77,11 @@ sudo systemctl restart vsftpd.service
 ##############################
 
 ## Create an SSL Certificate
-sudo openssl req -x509 -nodes -days 3650 -newkey rsa:4096 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
+openssl req -x509 -nodes -days 3650 -newkey rsa:4096 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
 
 
 ## Append TLS config to config file
-sudo echo \
+echo \
 "ssl_enable=YES
 rsa_cert_file=/etc/ssl/private/vsftpd.pem
 rsa_private_key_file=/etc/ssl/private/vsftpd.pem
@@ -97,7 +97,7 @@ ssl_ciphers=HIGH" \
 
 
 ## Restart vsftpd service
-sudo systemctl restart vsftpd.service
+systemctl restart vsftpd.service
 
 
 ############
@@ -105,7 +105,7 @@ sudo systemctl restart vsftpd.service
 ############
 
 ## Write vsftpd UFW application profile
-sudo echo \
+echo \
 "[vsftpd]
 title=Secure FTP Daemon
 description=TLS encrypted FTP server
@@ -114,7 +114,7 @@ ports=20,21,990/tcp|40000:50000/tcp" \
 
 
 ## Allow vsftpd application through firewall
-sudo ufw allow from 192.168.0.0/16 to any app vsftpd
-sudo ufw allow from 10.51.195.0/24 to any app vsftpd
+ufw allow from 192.168.0.0/16 to any app vsftpd
+ufw allow from 10.51.195.0/24 to any app vsftpd
 
-sudo ufw reload
+ufw reload
