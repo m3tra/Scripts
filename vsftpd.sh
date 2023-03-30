@@ -23,12 +23,12 @@ systemctl start vsftpd
 echo ""
 
 ## Create FTP root directory
-mkdir $USER_NAME/ftp
-chown nobody:nobody $USER_NAME/ftp
-chmod a-w $USER_NAME/ftp
+mkdir /home/$USER_NAME/ftp
+chown nobody:nobody /home/$USER_NAME/ftp
+chmod a-w /home/$USER_NAME/ftp
 
-mkdir $USER_NAME/ftp/files
-chown $USER_NAME:$USER_NAME $USER_NAME/ftp/files
+mkdir /home/$USER_NAME/ftp/files
+chown $USER_NAME:$USER_NAME /home/$USER_NAME/ftp/files
 
 
 ########################
