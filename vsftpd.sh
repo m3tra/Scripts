@@ -9,6 +9,9 @@ if [[ $EUID -ne 0 ]]; then
 	exit 2
 fi
 
+## Select user for FTP
+read -p "Choose SSH port(default 22): " USER_NAME
+
 ## Install
 apt install vsftpd -y
 echo ""
@@ -20,12 +23,12 @@ systemctl start vsftpd
 echo ""
 
 ## Create FTP root directory
-mkdir $LOGNAME/ftp
-chown nobody:nobody $LOGNAME/ftp
-chmod a-w $LOGNAME/ftp
+mkdir $USER_NAME/ftp
+chown nobody:nobody $USER_NAME/ftp
+chmod a-w $USER_NAME/ftp
 
-mkdir $LOGNAME/ftp/files
-chown $LOGNAME:$LOGNAME $LOGNAME/ftp/files
+mkdir $USER_NAME/ftp/files
+chown $USER_NAME:$USER_NAME $USER_NAME/ftp/files
 
 
 ########################
@@ -56,8 +59,8 @@ force_dot_files=YES
 pasv_min_port=40000
 pasv_max_port=50000
 
-user_sub_token=$LOGNAME
-local_root=/home/$LOGNAME/ftp
+user_sub_token=$USER_NAME
+local_root=/home/$USER_NAME/ftp
 
 userlist_enable=YES
 userlist_file=/etc/vsftpd.userlist
@@ -66,7 +69,7 @@ userlist_deny=NO" \
 
 
 ## Whitelist current user
-echo $LOGNAME > /etc/vsftpd.userlist
+echo $USER_NAME > /etc/vsftpd.userlist
 
 
 ## Restart vsftpd service
@@ -100,7 +103,6 @@ ssl_ciphers=HIGH" \
 
 ## Restart vsftpd service
 systemctl restart vsftpd.service
-echo ""
 
 
 ############
