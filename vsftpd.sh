@@ -11,12 +11,13 @@ fi
 
 ## Install
 apt install vsftpd -y
+echo ""
 
 
 ## Enable service
 systemctl enable vsftpd
 systemctl start vsftpd
-
+echo ""
 
 ## Create FTP root directory
 mkdir $LOGNAME/ftp
@@ -70,6 +71,7 @@ echo $LOGNAME > /etc/vsftpd.userlist
 
 ## Restart vsftpd service
 systemctl restart vsftpd.service
+echo ""
 
 
 ##############################
@@ -78,7 +80,7 @@ systemctl restart vsftpd.service
 
 ## Create an SSL Certificate
 openssl req -x509 -nodes -days 3650 -newkey rsa:4096 -keyout /etc/ssl/private/vsftpd.pem -out /etc/ssl/private/vsftpd.pem
-
+echo ""
 
 ## Append TLS config to config file
 echo \
@@ -98,6 +100,7 @@ ssl_ciphers=HIGH" \
 
 ## Restart vsftpd service
 systemctl restart vsftpd.service
+echo ""
 
 
 ############
